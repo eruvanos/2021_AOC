@@ -15,9 +15,9 @@ requests = "*"
 
 [package.source]
 type = "git"
-url = "https://github.com/SteadBytes/aocpy.git"
-reference = "master"
-resolved_reference = "948e8872f685b8ac0c76d673651dd3a26fedbd96"
+url = "https://github.com/eruvanos/aocpy.git"
+reference = "main"
+resolved_reference = "46a2deb661f316d72afc3d566c6a0d7b8d04add9"
 
 [[package]]
 name = "atomicwrites"
@@ -231,7 +231,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "af9a22870c0325371836723d5ec7f8016fad113cfa876d61de8922532f71ee13"
+content-hash = "9a398c77f294a93e6fcac23a988eeb707a9d0a1640421e80993893238fcbd8e7"
 
 [metadata.files]
 aocpy = []

@@ -6,7 +6,7 @@ authors = ["Maic Siemering <maic@siemering.tech>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aocpy = {git = "https://github.com/SteadBytes/aocpy.git"}
+aocpy = {git = "https://github.com/eruvanos/aocpy.git", branch="main"}
 pytest = "^6.2.5"
 
 [tool.poetry.dev-dependencies]
