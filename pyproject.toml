@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "2021-aoc"
+version = "0.1.0"
+description = ""
+authors = ["Maic Siemering <maic@siemering.tech>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aocpy = {git = "https://github.com/SteadBytes/aocpy.git"}
+pytest = "^6.2.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
