@@ -1,34 +1,32 @@
-# fmt: off
-import sys
+from pathlib import Path
 
-sys.path.append("..")
+import pytest
+from pytest import param
 
+import solution
 
-# fmt: on
-
-def part_1(data):
-    pass
-
-
-def part_2(data):
-    pass
+files = [
+    ("test_input.txt", None, None),
+]
 
 
-def parse(lines):
-    # lines = [int(l) for l in lines]
-    return lines
+@pytest.mark.parametrize(
+    "file,expected",
+    [param(Path(file), expected, id=file) for file, expected, _ in files],
+)
+def test_part_1(file: Path, expected):
+    lines = file.read_text().splitlines()
+
+    result = solution.part_1(solution.parse(lines))
+    assert result == expected
 
 
-def main(puzzle_input_f):
-    lines = [l.strip() for l in puzzle_input_f.readlines() if l]
-    print("Part 1: ", part_1(parse(lines[:])))
-    print("Part 2: ", part_2(parse(lines[:])))
+@pytest.mark.parametrize(
+    "file,expected",
+    [param(Path(file), expected, id=file) for file, _, expected in files],
+)
+def test_part_2(file: Path, expected):
+    lines = file.read_text().splitlines()
 
-
-if __name__ == "__main__":
-    import os
-    from aocpy import input_cli
-
-    base_dir = os.path.dirname(__file__)
-    with input_cli(base_dir) as f:
-        main(f)
+    result = solution.part_2(solution.parse(lines))
+    assert result == expected
