@@ -8,6 +8,7 @@ authors = ["Maic Siemering <maic@siemering.tech>"]
 python = "^3.10"
 aocpy = {git = "https://github.com/eruvanos/aocpy.git", branch="main"}
 pytest = "^6.2.5"
+termcolor = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 
