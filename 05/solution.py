@@ -9,6 +9,21 @@ sys.path.append("..")
 
 # fmt: on
 
+def generate_line_coordinates(x1, y1, x2, y2) -> list:
+    dx = 1 if x2 > x1 else -1 if x1 > x2 else 0
+    dy = 1 if y2 > y1 else -1 if y1 > y2 else 0
+    slope = Vec2(dx, dy)
+
+    cur = Vec2(x1, y1)
+    points = [cur]
+    while cur != Vec2(x2, y2):
+        cur += slope
+        points.append(cur)
+
+    # better for testing
+    return sorted(points)
+
+
 def part_1(data):
     dangerous_cells = []
 
@@ -22,40 +37,7 @@ def part_1(data):
                 dangerous_cells.append(pos)
 
     counter = Counter(dangerous_cells)
-    # for pos, count in counter.items():
-    #     print(f"{pos=}, {count=}")
-
-    # draw field
-    # for y in range(10):
-    #     print()
-    #     for x in range(10):
-    #         print(counter.get((x, y), "."), end="")
-
     return len(list(filter(lambda v: v > 1, counter.values())))
-
-
-def generate_line_coordinates(x1, y1, x2, y2) -> list:
-    angle_vector = Vec2(x2 - x1, y2 - y1)
-    angle = angle_vector.degree()
-
-    slope = {
-        0.0: Vec2(1, 0),
-        45.0: Vec2(1, 1),
-        90.0: Vec2(0, 1),
-        135.0: Vec2(-1, 1),
-        180.0: Vec2(-1, 0),
-        225.0: Vec2(-1, -1),
-        270.0: Vec2(0, -1),
-        315.0: Vec2(1, -1),
-    }[angle]
-
-    cur = Vec2(x1, y1)
-    points = [cur]
-    while cur != Vec2(x2, y2):
-        cur += slope
-        points.append(cur)
-
-    return sorted(points)
 
 
 def part_2(data):
