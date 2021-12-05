@@ -39,7 +39,6 @@ UDRL_VEC = {
     "L": Vec2(-1, 0),
 }
 
-
 NESW_ARROW = {
     "E": "R",
     "W": "L",
@@ -58,3 +57,15 @@ ARROW_NESW = {
 
 ANGLES_DIR = {"R": 90, "L": 270, "U": 0, "D": 180}
 """ARROW to Angle U = 0° """
+
+DEGREE_VECTOR = {
+    0.0: Vec2(1, 0),
+    45.0: Vec2(1, 1),
+    90.0: Vec2(0, 1),
+    135.0: Vec2(-1, 1),
+    180.0: Vec2(-1, 0),
+    225.0: Vec2(-1, -1),
+    270.0: Vec2(0, -1),
+    315.0: Vec2(1, -1),
+}
+"""Convert angle to slope Vec2, supports 45 degree steps"""
