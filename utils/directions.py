@@ -1,4 +1,4 @@
-from utils.vector import Vector
+from utils.vector import Vec2
 
 # Directions
 NORTH = "N"
@@ -11,10 +11,10 @@ FORWARD = "F"
 
 # Vectors for NESW
 NESW_VEC = {
-    "E": Vector(1, 0),
-    "W": Vector(-1, 0),
-    "N": Vector(0, 1),
-    "S": Vector(0, -1),
+    "E": Vec2(1, 0),
+    "W": Vec2(-1, 0),
+    "N": Vec2(0, 1),
+    "S": Vec2(0, -1),
 }
 
 # Turn maps for NESW
@@ -33,10 +33,10 @@ TURN_RIGHT = {
 
 # ARROW directions
 UDRL_VEC = {
-    "U": Vector(0, 1),
-    "D": Vector(0, -1),
-    "R": Vector(1, 0),
-    "L": Vector(-1, 0),
+    "U": Vec2(0, 1),
+    "D": Vec2(0, -1),
+    "R": Vec2(1, 0),
+    "L": Vec2(-1, 0),
 }
 
 
