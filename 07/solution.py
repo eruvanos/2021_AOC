@@ -1,50 +1,53 @@
 # fmt: off
 import sys
-from functools import lru_cache
+from typing import Callable, List
+
+import uniplot
 
 sys.path.append("..")
 
 
 # fmt: on
 
-def calc_fuel_usage_part_1(crabs, pos):
-    return sum(abs(pos - crab) for crab in crabs)
+
+def find_minimal_fuel_cost(crabs: List[int], cost_func: Callable, debug=False):
+    """
+    :param debug: does not stop at minima, plots the whole curve
+    """
+    values = {}
+    min_fuel = 9999999999999
+    for x in range(min(crabs), max(crabs)):
+        fuel = sum(cost_func(crab, x) for crab in crabs)
+        if debug:
+            values[x] = fuel
+
+        if fuel < min_fuel:
+            min_fuel = fuel
+        elif not debug:
+            break
+
+    if debug:
+        uniplot.plot(xs=list(values.keys()), ys=list(values.values()))
+
+    return min_fuel
 
 
 def part_1(data):
-    raw = list(map(int, data[0].split(",")))
+    crabs = list(map(int, data[0].split(",")))
 
-    min_fuel = max(raw) * len(raw)
-    # pos = max(raw)
-    for x in range(min(raw), max(raw)):
-        fuel = calc_fuel_usage_part_1(raw, x)
-        if fuel < min_fuel:
-            min_fuel = fuel
-            # pos = x
+    def fuel_cost(crab, pos):
+        return abs(pos - crab)
 
-    return min_fuel
-
-
-@lru_cache
-def fuel_cost(crab, pos):
-    return sum(range(abs(pos - crab) + 1))
-
-
-def calc_fuel_usage_part_2(crabs, pos):
-    return sum(fuel_cost(crab, pos) for crab in crabs)
+    return find_minimal_fuel_cost(crabs, fuel_cost, debug=False)
 
 
 def part_2(data):
-    raw = list(map(int, data[0].split(",")))
+    crabs = list(map(int, data[0].split(",")))
 
-    min_fuel = 9999999999999
-    for x in range(min(raw), max(raw)):
-        fuel = calc_fuel_usage_part_2(raw, x)
-        if fuel < min_fuel:
-            min_fuel = fuel
+    def fuel_cost(crab, pos):
+        return sum(range(abs(pos - crab) + 1))
 
-    # falsch: 1955000
-    return min_fuel
+    return find_minimal_fuel_cost(crabs, fuel_cost)
 
 
 def parse(lines):
