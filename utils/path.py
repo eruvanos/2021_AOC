@@ -59,6 +59,15 @@ class ArrayGraph(GridGraph):
         pos_neighbors = [(x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)]
         return [(x, y) for x, y in pos_neighbors if self.has(Vec2(x, y))]
 
+    def __iter__(self):
+        """
+        :return: a iterator of every field with its value (x,y,value)
+        """
+        for x, cs in enumerate(self._map):
+            for y, c in enumerate(cs):
+                if c < min(self.get(n) for n in self.neighbors((x, y))):
+                    yield x, y, c
+
 
 class MapGraph(GridGraph):
     """

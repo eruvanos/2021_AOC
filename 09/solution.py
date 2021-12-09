@@ -2,38 +2,36 @@
 import math
 import sys
 
-import utils.path
-from utils.vector import Vec2
+from utils.path import ArrayGraph
 
 sys.path.append("..")
 
 
 # fmt: on
 
-def find_minima(data):
-    graph = utils.path.ArrayGraph(data)
-    minima = []
-    for x, cs in enumerate(data):
-        for y, c in enumerate(cs):
-            if c < min(graph.get(n) for n in graph.neighbors((x, y))):
-                minima.append((x, y, c))
-    return minima
+def find_minima(graph: ArrayGraph):
+
+    return [
+        (x, y, c)
+        for x, y, c in graph
+        if c < min(graph.get(n) for n in graph.neighbors((x, y)))
+    ]
 
 
 def part_1(data):
-    minima = find_minima(data)
+    minima = find_minima(ArrayGraph(data))
     # print(graph.neighbors(Vec2(0, 0)))
     return sum(c + 1 for x, y, c in minima)
 
 
 def part_2(data):
-    minima = find_minima(data)
-    graph = utils.path.ArrayGraph(data)
+    graph = ArrayGraph(data)
+    minima = find_minima(graph)
 
-    basins = []
-    for x,y,_ in minima:
+    basin_sizes = []
+    for x, y, _ in minima:
         basin = set()
-        neighbors = [(x,y)]
+        neighbors = [(x, y)]
         while neighbors:
             current = neighbors.pop()
             basin.add(current)
@@ -41,11 +39,9 @@ def part_2(data):
                 if n not in basin and graph.get(n) != 9:
                     neighbors.append(n)
 
-        basins.append(len(basin))
+        basin_sizes.append(len(basin))
 
-    return math.prod(list(sorted(basins, reverse=True))[:3])
-
-
+    return math.prod(list(sorted(basin_sizes, reverse=True))[:3])
 
 
 def parse(lines):
