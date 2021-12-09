@@ -1,9 +1,9 @@
 import math
 from collections import deque
-from typing import List
+from typing import List, Tuple
 
-from utils import Vector
 from utils.data import PriorityQueue
+from utils.vector import Vec2
 
 
 def manhattan(a, b):
@@ -17,18 +17,18 @@ def flip(pos):
 
 
 class Graph:
-    def neighbors(self, current: Vector) -> List:
+    def neighbors(self, current: Vec2) -> List:
         raise NotImplementedError()
 
-    def cost(self, current: Vector, next: Vector) -> int:
+    def cost(self, current: Vec2, next: Vec2) -> int:
         raise NotImplementedError()
 
 
 class GridGraph(Graph):
-    def neighbors(self, current: Vector) -> List:
+    def neighbors(self, current: Vec2) -> List:
         raise NotImplementedError()
 
-    def cost(self, current: Vector, next: Vector):
+    def cost(self, current: Vec2, next: Vec2):
         return manhattan(current, next)
 
 
@@ -43,10 +43,21 @@ class ArrayGraph(GridGraph):
     def __init__(self, map):
         self._map = map
 
-    def neighbors(self, current: Vector) -> List:
+    def get(self, pos: Tuple[int, int], default=None):
+        x, y = pos
+        if self.has(pos):
+            return self._map[x][y]
+        else:
+            return default
+
+    def has(self, pos: Tuple[int, int]):
+        x, y = pos
+        return 0 <= x < len(self._map) and 0 <= y < len(self._map[x])
+
+    def neighbors(self, current: Tuple[int, int]) -> List:
         x, y = current
         pos_neighbors = [(x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)]
-        return [(x, y) for x, y in pos_neighbors if self._map[x][y]]
+        return [(x, y) for x, y in pos_neighbors if self.has(Vec2(x, y))]
 
 
 class MapGraph(GridGraph):
@@ -60,7 +71,7 @@ class MapGraph(GridGraph):
     def __init__(self, map):
         self._map = map
 
-    def neighbors(self, current: Vector) -> List:
+    def neighbors(self, current: Vec2) -> List:
         x, y = current
         pos_neighbors = [(x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)]
         return [(x, y) for x, y in pos_neighbors if self._map[x][y]]
@@ -77,7 +88,7 @@ class SetGraph(GridGraph):
     def __init__(self, map):
         self._map = map
 
-    def neighbors(self, current: Vector) -> List:
+    def neighbors(self, current: Vec2) -> List:
         x, y = current
         pos_neighbors = [(x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)]
         return [(x, y) for x, y in pos_neighbors if (x, y) not in self._map]

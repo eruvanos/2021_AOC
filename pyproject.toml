@@ -9,6 +9,7 @@ python = "^3.10"
 aocpy = {git = "https://github.com/eruvanos/aocpy.git", branch="main"}
 pytest = "^6.2.5"
 termcolor = "^1.1.0"
+tqdm = "^4.62.3"
 
 [tool.poetry.dev-dependencies]
 
