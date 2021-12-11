@@ -5,7 +5,7 @@ from itertools import count
 
 from termcolor import colored
 
-from utils.vector import Vec2
+from utils.vector import Vec2, neigbors
 
 sys.path.append("..")
 
@@ -24,12 +24,6 @@ def print_levels(octos_by_level, flashed=None):
             else:
                 print(octos_by_coords[(x, y)], end="")
         print()
-
-
-def neigbors(vec: Vec2):
-    for x in range(-1, 2):
-        for y in range(-1, 2):
-            yield vec + Vec2(x, y)
 
 
 def step(octos_by_level):
@@ -73,15 +67,16 @@ def step(octos_by_level):
     return res, flashed
 
 
-def part_1(octos_by_level):
+def part_1(octos_by_level, debug=False):
     total_flashed = 0
     print_levels(octos_by_level)
     for r in range(100):
-        # print()
-        # print(f"=== {r+1} ===")
         octos_by_level, flashed = step(octos_by_level)
         total_flashed += len(flashed)
-        # print_levels(octos_by_level, flashed)
+        if debug:
+            print()
+            print(f"=== {r + 1} ===")
+            print_levels(octos_by_level, flashed)
 
     return total_flashed
 
@@ -92,11 +87,8 @@ def part_2(octos_by_level):
 
     r = 0
     for r in count(1):
-        # print()
-        # print(f"=== {r+1} ===")
         octos_by_level, flashed = step(octos_by_level)
         total_flashed += len(flashed)
-
         if len(flashed) == 100:
             break
 

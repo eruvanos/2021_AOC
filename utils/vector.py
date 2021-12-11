@@ -2,6 +2,19 @@ import math
 from typing import NamedTuple
 
 
+def neigbors(vec: "Vec2"):
+    for x in range(-1, 2):
+        for y in range(-1, 2):
+            yield vec + Vec2(x, y)
+
+
+def manhatten_neighbors(vec: "Vec2"):
+    yield vec + (0, 1)
+    yield vec + (1, 0)
+    yield vec + (0, -1)
+    yield vec + (-1, 0)
+
+
 class Vec2(NamedTuple):
     x: int
     y: int
