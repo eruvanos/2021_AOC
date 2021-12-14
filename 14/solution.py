@@ -1,64 +1,45 @@
 # fmt: off
 import sys
 from collections import Counter, defaultdict
-from io import StringIO
 from math import ceil
 
-import tqdm
+from utils.data import slice
 
 sys.path.append("..")
 
 
 # fmt: on
-def slice(text: str, chunk_size: int, overlap=0):
-    while len(text) >= chunk_size:
-        to_send, text = text[:chunk_size], text[chunk_size-overlap:]
-        yield to_send
-
-def part_1(data):
-    poly, rules = data
-
-    # steps
-    for step in range(10):
-        # poly = "".join(map(rules.__getitem__, slice(poly, 2, 1))) + poly[-1]
-        new_poly = defaultdict(int)
-        for pair, appearance in poly.items():
-            for seq in rules[pair]:
-                new_poly[seq] += appearance
-
-        poly = new_poly
-        print(f"Step {step + 1}: {poly}")
-
-    # result
-    counter = defaultdict(int)
-    for (a,b), appearance in poly.items():
-        counter[a] += appearance
-        counter[b] += appearance
-
-    return ceil(max(counter.values())/2) - ceil(min(counter.values())/2)
+def step(poly, rules):
+    new_poly = defaultdict(int)
+    for pair, appearance in poly.items():
+        for seq in rules[pair]:
+            new_poly[seq] += appearance
+    return new_poly
 
 
-def part_2(data):
-    poly, rules = data
-
-    # steps
-    for step in range(40):
-        # poly = "".join(map(rules.__getitem__, slice(poly, 2, 1))) + poly[-1]
-        new_poly = defaultdict(int)
-        for pair, appearance in poly.items():
-            for seq in rules[pair]:
-                new_poly[seq] += appearance
-
-        poly = new_poly
-        print(f"Step {step + 1}: {poly}")
-
-    # result
+def calc_score(poly):
     counter = defaultdict(int)
     for (a, b), appearance in poly.items():
         counter[a] += appearance
         counter[b] += appearance
 
     return ceil(max(counter.values()) / 2) - ceil(min(counter.values()) / 2)
+
+
+def part_1(data, rounds=10):
+    poly, rules = data
+
+    # steps
+    for i in range(rounds):
+        poly = step(poly, rules)
+        print(f"Step {i + 1}: {poly}")
+
+    # result
+    return calc_score(poly)
+
+
+def part_2(data):
+    return part_1(data, 40)
 
 
 def parse(lines):
@@ -71,8 +52,6 @@ def parse(lines):
     while lines and (line := lines.pop(0)):
         pair, addition = line.split(" -> ")
         rules[pair] = (pair[0] + addition, addition + pair[1])
-
-
 
     return poly, rules
 

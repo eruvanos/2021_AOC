@@ -17,3 +17,9 @@ class PriorityQueue:
 
     def empty(self):
         return len(self._queue) == 0
+
+
+def slice(text: str, chunk_size: int, overlap=0):
+    while len(text) >= chunk_size:
+        to_send, text = text[:chunk_size], text[chunk_size - overlap:]
+        yield to_send
