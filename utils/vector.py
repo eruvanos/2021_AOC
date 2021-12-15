@@ -1,14 +1,22 @@
 import math
-from typing import NamedTuple
+from typing import NamedTuple, Iterable
 
 
 def neigbors(vec: "Vec2"):
-    for x in range(-1, 2):
-        for y in range(-1, 2):
-            yield vec + Vec2(x, y)
+    """Manhattan neighbors inc diagonal, clockwise"""
+    vec = Vec2(*vec)
+    yield vec + (0, 1)
+    yield vec + (1, 1)
+    yield vec + (1, 0)
+    yield vec + (1, -1)
+    yield vec + (0, -1)
+    yield vec + (-1, -1)
+    yield vec + (-1, 0)
+    yield vec + (-1, -1)
 
 
-def manhatten_neighbors(vec: "Vec2"):
+def manhattan_neighbors(vec: "Vec2"):
+    """Manhattan neighbors, clockwise"""
     vec = Vec2(*vec)
     yield vec + (0, 1)
     yield vec + (1, 0)
@@ -16,7 +24,16 @@ def manhatten_neighbors(vec: "Vec2"):
     yield vec + (-1, 0)
 
 
+def get_max_x(vecs: Iterable["Vec2"]):
+    return max(x for x, _ in vecs)
+
+
+def get_max_y(vecs: Iterable["Vec2"]):
+    return max(y for _, y in vecs)
+
+
 class Vec2(NamedTuple):
+    """2D Vector implementation with basic features"""
     x: int
     y: int
 
@@ -58,6 +75,7 @@ class Vec2(NamedTuple):
 
 
 class Vec3(NamedTuple):
+    """3D Vector implementation with basic features"""
     x: int
     y: int
     z: int
@@ -72,19 +90,3 @@ class Vec3(NamedTuple):
 
     def __mul__(self, other):
         return Vec3(self.x * other, self.y * other, self.z * other)
-
-    # def rotate_degree(self, degree):
-    #     """
-    #     Rotate clockwise
-    #     """
-    #     return self.rotate(math.radians(degree))
-    #
-    # def rotate(self, radian):
-    #     """
-    #     Rotate clockwise
-    #     """
-    #     cos = math.cos(-radian)
-    #     sin = math.sin(-radian)
-    #     x = self.x * cos - self.y * sin
-    #     y = self.x * sin + self.y * cos
-    #     return Vector(round(x), round(y))

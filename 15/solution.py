@@ -1,33 +1,17 @@
 # fmt: off
 import sys
 from collections import defaultdict
-from typing import Set, List, Dict
+from typing import Set, List, Dict, Iterable
 
 from termcolor import colored
 
 from utils.path import Graph, a_star_search, manhattan
-from utils.vector import Vec2, manhatten_neighbors
+from utils.vector import Vec2, manhattan_neighbors, get_max_x, get_max_y
 
 sys.path.append("..")
 
 
 # fmt: on
-
-def print_grid(grid, visited: Set):
-    max_x = max(x for x, _ in grid.keys()) + 1
-    max_y = max(y for _, y in grid.keys()) + 1
-
-    if visited is None:
-        visited = set()
-
-    for y in range(max_y):
-        for x in range(max_x):
-            if (x, y) in visited:
-                print(colored(grid[(x, y)], color="yellow"), end="")
-            else:
-                print(grid[(x, y)], end="")
-        print()
-
 
 class MyGraph(Graph):
     def __init__(self, data: Dict, scale=1):
@@ -50,40 +34,53 @@ class MyGraph(Graph):
                     self.data[(x, y)] = cost
 
     def neighbors(self, current: Vec2) -> List:
-        return [n for n in manhatten_neighbors(current) if n in self.data]
+        return [n for n in manhattan_neighbors(current) if n in self.data]
 
     def cost(self, current: Vec2, next: Vec2) -> int:
         return self.data[next]
 
+    def print(self, visited: Iterable[Vec2]):
+        visited = set(visited)
+        max_x = max(x for x, _ in self.data.keys()) + 1
+        max_y = max(y for _, y in self.data.keys()) + 1
+
+        if visited is None:
+            visited = set()
+
+        for y in range(max_y):
+            for x in range(max_x):
+                if (x, y) in visited:
+                    print(colored(self.data[(x, y)], color="yellow"), end="")
+                else:
+                    print(self.data[(x, y)], end="")
+            print()
+
 
 def part_1(grid):
-    max_x = max(x for x, _ in grid.keys())
-    max_y = max(y for _, y in grid.keys())
-    start = (0, 0)
-    target = (max_x, max_y)
+    start = Vec2(0, 0)
+    target = Vec2(get_max_x(grid.keys()), get_max_y(grid.keys()))
 
     graph = MyGraph(grid)
     path = a_star_search(graph, start, target) or []
 
     print()
-    print_grid(grid, set(path))
+    graph.print(path)
     print(f"{path=}")
 
     return sum(grid[pos] for pos in path)
 
 
 def part_2(grid):
-    len_x = max(x for x, _ in grid.keys()) + 1
-    len_y = max(y for _, y in grid.keys()) + 1
+    start = Vec2(0, 0)
 
-    start = (0, 0)
-    target = (len_x * 5 - 1, len_y * 5 - 1)
+    len_x = get_max_x(grid.keys()) + 1
+    len_y = get_max_y(grid.keys()) + 1
+    target = Vec2(len_x * 5 - 1, len_y * 5 - 1)
 
     graph = MyGraph(grid, scale=5)
     path = a_star_search(graph, start, target) or []
 
     print()
-    # print_grid(grid, set(path))
     print(f"{path=}")
 
     return sum(grid[pos] for pos in path)

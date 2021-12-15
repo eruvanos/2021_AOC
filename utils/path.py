@@ -1,14 +1,14 @@
 import math
 from collections import deque
-from typing import List, Tuple, Optional
+from typing import List, Optional, Set, Dict, Any
 
 from utils.data import PriorityQueue
-from utils.vector import Vec2
+from utils.vector import Vec2, manhattan_neighbors
 
 
-def manhattan(a, b):
-    (x1, y1) = a
-    (x2, y2) = b
+def manhattan(start: Vec2, target: Vec2):
+    (x1, y1) = start
+    (x2, y2) = target
     return abs(x1 - x2) + abs(y1 - y2)
 
 
@@ -17,47 +17,46 @@ def flip(pos):
 
 
 class Graph:
+    """Abstraction of graph"""
+
     def neighbors(self, current: Vec2) -> List:
+        """List coordinates of all valid neighbors"""
         raise NotImplementedError()
 
-    def cost(self, current: Vec2, next: Vec2) -> int:
+    def cost(self, current: Vec2, neighbor: Vec2) -> int:
+        """Provides costs to the neighbor"""
         raise NotImplementedError()
 
 
 class GridGraph(Graph):
-    def neighbors(self, current: Vec2) -> List:
-        raise NotImplementedError()
+    """Graph using manhattan distance for cost function"""
 
-    def cost(self, current: Vec2, next: Vec2):
-        return manhattan(current, next)
+    def cost(self, current: Vec2, neighbor: Vec2):
+        return manhattan(current, neighbor)
 
 
 class ArrayGraph(GridGraph):
     """
-    Graph implementation backed by an array like obj used like obj[x][y] -> bool
-    Value:
-    * True: blocked
-    * False: free to go
+    GridGraph implementation backed by an array like obj used like obj[x][y].
+    Uses manhattan neighbors.
     """
 
     def __init__(self, map):
         self._map = map
 
-    def get(self, pos: Tuple[int, int], default=None):
+    def get(self, pos: Vec2, default=None):
         x, y = pos
         if self.has(pos):
             return self._map[x][y]
         else:
             return default
 
-    def has(self, pos: Tuple[int, int]):
+    def has(self, pos: Vec2):
         x, y = pos
         return 0 <= x < len(self._map) and 0 <= y < len(self._map[x])
 
-    def neighbors(self, current: Tuple[int, int]) -> List:
-        x, y = current
-        pos_neighbors = [(x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)]
-        return [(x, y) for x, y in pos_neighbors if self.has(Vec2(x, y))]
+    def neighbors(self, current: Vec2) -> List:
+        return [n for n in manhattan_neighbors(current) if self.has(n)]
 
     def __iter__(self):
         """
@@ -65,45 +64,37 @@ class ArrayGraph(GridGraph):
         """
         for x, cs in enumerate(self._map):
             for y, c in enumerate(cs):
-                if c < min(self.get(n) for n in self.neighbors((x, y))):
+                if c < min(self.get(n) for n in self.neighbors(Vec2(x, y))):
                     yield x, y, c
 
 
 class MapGraph(GridGraph):
     """
-    Graph implementation backed by a map used like map[(x,y)] -> bool
-    Value:
-    * True: blocked
-    * False: free to go
+    Graph implementation backed by a map used like Dict[Vec2, Any].
+
+    For search algorithms, only not blocked nodes should be added.
     """
 
-    def __init__(self, map):
-        self._map = map
+    def __init__(self, data: Dict[Vec2, Any]):
+        self.data = data
 
     def neighbors(self, current: Vec2) -> List:
-        x, y = current
-        pos_neighbors = [(x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)]
-        return [(x, y) for x, y in pos_neighbors if self._map[x][y]]
+        return [n for n in manhattan_neighbors(current) if n in self.data]
 
 
 class SetGraph(GridGraph):
     """
-    Graph implementation backed by a set used like pos in set -> bool
-    Value:
-    * True: blocked
-    * False: free to go
+    Graph implementation backed by a Set[Vec2]
     """
 
-    def __init__(self, map):
-        self._map = map
+    def __init__(self, data: Set[Vec2]):
+        self.data = data
 
     def neighbors(self, current: Vec2) -> List:
-        x, y = current
-        pos_neighbors = [(x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)]
-        return [(x, y) for x, y in pos_neighbors if (x, y) not in self._map]
+        return [n for n in manhattan_neighbors(current) if n in self.data]
 
 
-def reconstruct_path(came_from, goal):
+def _reconstruct_path(came_from, goal):
     current = goal
     path = [current]
     while came_from[current]:
@@ -113,7 +104,11 @@ def reconstruct_path(came_from, goal):
     return path[1:]
 
 
-def a_star_search(graph: Graph, start, goal) -> Optional[List[Vec2]]:
+def a_star_search(graph: Graph, start: Vec2, goal: Vec2) -> Optional[List[Vec2]]:
+    """Implementation of A* algorithm.
+
+    The algorithm uses a guess function (in this case manhattan distance) to prioritise path.
+    """
     if start == goal:
         return []
 
@@ -127,23 +122,27 @@ def a_star_search(graph: Graph, start, goal) -> Optional[List[Vec2]]:
         current = frontier.get()[1]
 
         if current == goal:
-            return reconstruct_path(came_from, goal)
+            return _reconstruct_path(came_from, goal)
 
         neighbors = graph.neighbors(current)
-        for next in neighbors:
-            new_cost = cost_so_far[current][0] + graph.cost(current, next)
-            if next not in cost_so_far or (new_cost, flip(current)) < cost_so_far[next]:
-                cost_so_far[next] = (new_cost, flip(current))
-                priority = new_cost + manhattan(goal, next)
+        for neighbor in neighbors:
+            new_cost = cost_so_far[current][0] + graph.cost(current, neighbor)
+            if neighbor not in cost_so_far or (new_cost, flip(current)) < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = (new_cost, flip(current))
+                priority = new_cost + manhattan(goal, neighbor)
 
-                frontier.put((priority, next))
-                came_from[next] = current
+                frontier.put((priority, neighbor))
+                came_from[neighbor] = current
 
-    # return came_from, cost_so_far
     return None
 
 
-def deepsearch(graph: Graph, pos, targets):
+def breadth_first_search(graph: Graph, pos: Vec2, targets: Set[Vec2]):
+    """
+    Breadth-first search (BFS) is an algorithm for searching a graph for a node that satisfies a given property.
+
+    This implementation support search for multiple targets, returning path to the closest one (manhatten distance)
+    """
     if pos in targets:
         return []
 
@@ -156,7 +155,7 @@ def deepsearch(graph: Graph, pos, targets):
     max_depth = math.inf
     while todo:
         depth, current = todo.popleft()
-        if max_depth < depth:
+        if depth > max_depth:
             break
 
         neighbors = graph.neighbors(current)
@@ -169,8 +168,8 @@ def deepsearch(graph: Graph, pos, targets):
                     max_depth = min(depth, max_depth)
                     found.append(neighbor)
 
-    if len(found) == 0:
+    if not found:
         return None
 
     found.sort(key=lambda p: flip(p))
-    return reconstruct_path(came_from, found[0])
+    return _reconstruct_path(came_from, found[0])
