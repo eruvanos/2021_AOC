@@ -9,6 +9,7 @@ def neigbors(vec: "Vec2"):
 
 
 def manhatten_neighbors(vec: "Vec2"):
+    vec = Vec2(*vec)
     yield vec + (0, 1)
     yield vec + (1, 0)
     yield vec + (0, -1)

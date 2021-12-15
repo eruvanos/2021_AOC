@@ -1,6 +1,6 @@
 import math
 from collections import deque
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from utils.data import PriorityQueue
 from utils.vector import Vec2
@@ -113,11 +113,10 @@ def reconstruct_path(came_from, goal):
     return path[1:]
 
 
-def a_star_search(graph: Graph, start, goal):
+def a_star_search(graph: Graph, start, goal) -> Optional[List[Vec2]]:
     if start == goal:
         return []
 
-    # frontier = PriorityQueue()
     frontier = PriorityQueue()
     frontier.put((0, start))
 
