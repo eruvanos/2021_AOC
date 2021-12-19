@@ -1,10 +1,9 @@
 # fmt: off
 import sys
 from ast import literal_eval
-from dataclasses import dataclass
 from itertools import permutations
 from math import ceil
-from typing import List
+from typing import List, Optional, Iterable, Tuple
 
 sys.path.append("..")
 
@@ -12,14 +11,16 @@ sys.path.append("..")
 # fmt: on
 
 class BaseNode:
-    def walk(self):
-        pass
+    parent: Optional["BaseNode"]
 
+    def walk(self, depth=0) -> Iterable[Tuple["Leaf", int]]:
+        raise NotImplementedError
 
-@dataclass
-class Leaf(BaseNode):
-    value: int
-    parent: "Node" = None
+    def magnitude(self):
+        raise NotImplementedError
+
+    def reduce(self):
+        raise NotImplementedError
 
     def __add__(self, other):
         node = Node(self, other)
@@ -27,11 +28,14 @@ class Leaf(BaseNode):
         other.parent = node
         return node.reduce()
 
-    def walk(self):
-        yield self
 
-    def find_exploding(self, depth=0):
-        return None  # ?
+class Leaf(BaseNode):
+    def __init__(self, value: int, parent=None):
+        self.parent = parent
+        self.value = value
+
+    def walk(self, depth=0):
+        yield self, depth
 
     def reduce(self):
         return self
@@ -43,37 +47,43 @@ class Leaf(BaseNode):
         return str(self.value)
 
 
-@dataclass
 class Node(BaseNode):
-    x: BaseNode
-    y: BaseNode
-    parent: "Node" = None
+    def __init__(self, x: BaseNode, y: BaseNode, parent=None):
+        self.parent = parent
+        self.x = x
+        self.y = y
 
-    def __add__(self, other):
-        node = Node(self, other)
-        self.parent = node
-        other.parent = node
-        return node.reduce()
+        # update parent relation
+        self.x.parent = self
+        self.y.parent = self
+
+    def find_exploding(self) -> Optional["Node"]:
+        for node, depth in self.walk():
+            if depth == 4:
+                assert isinstance(node, Node)
+                return node
+
+        return None
 
     def explode(self):
         exploding = self.find_exploding()
         if exploding is None:
             return None
 
-        leafs = list(self.walk())
+        leaves = list(self.walk())
         # TODO fix comparison (causes infinit recursion due to parent.child comparison)
-        # explode_index = leafs.index(exploding.x)
-        for i, l in enumerate(leafs):
-            if id(l) == id(exploding.x):
-                break
-        else:
-            raise "Unexpected"
-        explode_index = i
+        explode_index = leaves.index(exploding.x)
+        # for i, l in enumerate(leaves):
+        #     if id(l) == id(exploding.x):
+        #         break
+        # else:
+        #     raise "Unexpected"
+        # explode_index = i
 
         if explode_index > 0:
-            leafs[explode_index - 1].value += exploding.x.value
-        if explode_index + 2 < len(leafs):
-            leafs[explode_index + 2].value += exploding.y.value
+            leaves[explode_index - 1].value += exploding.x.value
+        if explode_index + 2 < len(leaves):
+            leaves[explode_index + 2].value += exploding.y.value
 
         parent = exploding.parent
         new_leaf = Leaf(0, parent=parent)
@@ -85,8 +95,8 @@ class Node(BaseNode):
         return self
 
     def find_splitting(self):
-        leafs = list(self.walk())
-        for leaf in leafs:
+        leaves = list(self.walk())
+        for leaf in leaves:
             if leaf.value >= 10:
                 return leaf
 
@@ -103,8 +113,6 @@ class Node(BaseNode):
             Leaf(ceil(leaf.value / 2)),
             parent=parent
         )
-        split_node.x.parent = split_node
-        split_node.y.parent = split_node
 
         if parent.x == leaf:
             parent.x = split_node
@@ -127,15 +135,9 @@ class Node(BaseNode):
     def __repr__(self):
         return f"[{self.x},{self.y}]"
 
-    def walk(self):
-        yield from self.x.walk()
-        yield from self.y.walk()
-
-    def find_exploding(self, depth=0):
-        if depth == 4:
-            return self
-        else:
-            return self.x.find_exploding(depth + 1) or self.y.find_exploding(depth + 1)
+    def walk(self, depth=0):
+        yield from self.x.walk(depth + 1)
+        yield from self.y.walk(depth + 1)
 
     def magnitude(self):
         return 3 * self.x.magnitude() + 2 * self.y.magnitude()
@@ -155,12 +157,14 @@ class Node(BaseNode):
             case i:
                 return Leaf(i)
 
+
 def magnitude(num: List | int):
     if isinstance(num, int):
         return num
 
     a, b = num
     return 3 * magnitude(a) + 2 * magnitude(b)
+
 
 def reduce(data: List):
     result = Node.read(data[0])
@@ -170,18 +174,17 @@ def reduce(data: List):
         print(result)
     return result
 
+
 def part_1(data):
     return reduce(data).magnitude()
 
 
 def part_2(data):
-
     max_mag = 0
-    for a,b in permutations(data, 2):
+    for a, b in permutations(data, 2):
         max_mag = max((Node.read(a) + Node.read(b)).magnitude(), max_mag)
 
     return max_mag
-
 
 
 def parse(lines):
