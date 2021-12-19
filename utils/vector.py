@@ -90,3 +90,8 @@ class Vec3(NamedTuple):
 
     def __mul__(self, other):
         return Vec3(self.x * other, self.y * other, self.z * other)
+
+    def manhattan(self, other: "Vec3"):
+        (x1, y1, z1) = self
+        (x2, y2, z2) = other
+        return abs(x1 - x2) + abs(y1 - y2) + abs(z1 - z2)
