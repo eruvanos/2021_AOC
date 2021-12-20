@@ -15,6 +15,22 @@ def neigbors(vec: "Vec2"):
     yield vec + (-1, -1)
 
 
+def neigbors_tl_br(vec: "Vec2", include_center=False):
+    """Manhattan neighbors inc diagonal, top-left to bottom-right"""
+    vec = Vec2(*vec)
+    yield vec + (-1, -1)
+    yield vec + (0, -1)
+    yield vec + (1, -1)
+    yield vec + (-1, 0)
+
+    if include_center:
+        yield vec
+
+    yield vec + (1, 0)
+    yield vec + (-1, 1)
+    yield vec + (0, 1)
+    yield vec + (1, 1)
+
 def manhattan_neighbors(vec: "Vec2"):
     """Manhattan neighbors, clockwise"""
     vec = Vec2(*vec)
@@ -24,8 +40,16 @@ def manhattan_neighbors(vec: "Vec2"):
     yield vec + (-1, 0)
 
 
+def get_min_x(vecs: Iterable["Vec2"]):
+    return min(x for x, _ in vecs)
+
+
 def get_max_x(vecs: Iterable["Vec2"]):
     return max(x for x, _ in vecs)
+
+
+def get_min_y(vecs: Iterable["Vec2"]):
+    return min(y for _, y in vecs)
 
 
 def get_max_y(vecs: Iterable["Vec2"]):

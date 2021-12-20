@@ -51,6 +51,12 @@ class ArrayGraph(GridGraph):
         else:
             return default
 
+    def width(self):
+        return len(self._map[0])
+
+    def height(self):
+        return len(self._map)
+
     def has(self, pos: Vec2):
         x, y = pos
         return 0 <= x < len(self._map) and 0 <= y < len(self._map[x])
@@ -77,6 +83,15 @@ class MapGraph(GridGraph):
 
     def __init__(self, data: Dict[Vec2, Any]):
         self.data = data
+
+    def get(self, cur: Vec2, default=None):
+        return self.data.get(cur, default)
+
+    def keys(self):
+        return self.data.keys()
+
+    def __iter__(self):
+        return self.data.items()
 
     def neighbors(self, current: Vec2) -> List:
         return [n for n in manhattan_neighbors(current) if n in self.data]
