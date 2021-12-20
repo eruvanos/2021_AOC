@@ -10,37 +10,9 @@ sys.path.append("..")
 
 # fmt: on
 
-def part_1(data):
-    algorithm, image = data
-    image: Dict
-
+def enhance(image, algorithm, iterations):
     default = "."
-
-    for _ in range(2):
-        new_image = {}
-        min_x = get_min_x(image.keys())
-        max_x = get_max_x(image.keys())
-        min_y = get_min_y(image.keys())
-        max_y = get_max_y(image.keys())
-        for x in range(min_x - 2, max_x + 3):
-            for y in range(min_y - 2, max_y + 3):
-                index_string = "".join(image.get(n, default) for n in neigbors_tl_br(Vec2(x, y), True))
-                index = int(index_string.replace(".", "0").replace("#", "1"), 2)
-                new_image[Vec2(x, y)] = algorithm[index]
-        image = new_image
-
-        default = algorithm[0]
-
-    return Counter(image.values())["#"]
-
-
-def part_2(data):
-    algorithm, image = data
-    image: Dict
-
-    default = "."
-
-    for i in range(50):
+    for i in range(iterations):
         new_image = {}
         min_x = get_min_x(image.keys())
         max_x = get_max_x(image.keys())
@@ -54,11 +26,21 @@ def part_2(data):
         image = new_image
 
         # calc infinity default
-        index_string = "".join(image.get(n, default) for n in neigbors_tl_br(Vec2(-100, -100), True))
-        index = int(index_string.replace(".", "0").replace("#", "1"), 2)
+        index = int((default * 9).replace(".", "0").replace("#", "1"), 2)
         default = algorithm[index]
         print("new default:", default)
+    return image
 
+
+def part_1(data):
+    algorithm, image = data
+    image = enhance(image, algorithm, 2)
+    return Counter(image.values())["#"]
+
+
+def part_2(data):
+    algorithm, image = data
+    image = enhance(image, algorithm, 50)
     return Counter(image.values())["#"]
 
 

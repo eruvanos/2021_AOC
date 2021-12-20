@@ -7,6 +7,7 @@ import solution
 
 files = [
     ("test_input.txt", 35, 3351),
+    ("input.txt", 4917, 16389),
 ]
 
 
