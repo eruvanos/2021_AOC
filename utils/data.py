@@ -9,6 +9,9 @@ class PriorityQueue:
     def __init__(self):
         self._queue = []
 
+    def __bool__(self):
+        return not self.empty()
+
     def put(self, item):
         heapq.heappush(self._queue, item)
 
