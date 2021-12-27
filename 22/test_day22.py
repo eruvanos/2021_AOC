@@ -6,9 +6,10 @@ from pytest import param
 import solution
 
 files = [
-    # ("test_input_1.txt", 39, None),
-    # ("test_input_2.txt", 590784, None),
+    ("test_input_1.txt", 39, None),
+    ("test_input_2.txt", 590784, None),
     ("test_input_3.txt", 1, None),
+    ("test_input_4.txt", 1, None),
 ]
 
 
@@ -36,12 +37,12 @@ def test_part_2(file: Path, expected):
 
 
 def test_intersection():
-    c1 = solution.Cube(10, 20, 10, 20, 10, 20)
-    c2 = solution.Cube(15, 25, 15, 25, 15, 25)
-    assert c1.intersection(c2) == solution.Cube(15, 20, 15, 20, 15, 20)
+    c1 = solution.Cube(10, 20, 10, 20, 10, 20, True)
+    c2 = solution.Cube(15, 25, 15, 25, 15, 25, True)
+    assert c1.intersection(c2) == solution.Cube(15, 20, 15, 20, 15, 20, False)
 
 
 def test_intersection_non_overlap():
-    c1 = solution.Cube(10, 20, 10, 20, 10, 20)
-    c2 = solution.Cube(20, 25, 20, 25, 20, 25)
+    c1 = solution.Cube(10, 20, 10, 20, 10, 20, True)
+    c2 = solution.Cube(21, 25, 21, 25, 21, 25, True)
     assert c1.intersection(c2) is None
