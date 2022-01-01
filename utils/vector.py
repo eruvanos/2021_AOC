@@ -1,5 +1,5 @@
 import math
-from typing import NamedTuple, Iterable
+from typing import NamedTuple, Iterable, Tuple
 
 
 def neigbors(vec: "Vec2"):
@@ -30,6 +30,7 @@ def neigbors_tl_br(vec: "Vec2", include_center=False):
     yield vec + (-1, 1)
     yield vec + (0, 1)
     yield vec + (1, 1)
+
 
 def manhattan_neighbors(vec: "Vec2"):
     """Manhattan neighbors, clockwise"""
@@ -71,6 +72,10 @@ class Vec2(NamedTuple):
 
     def __mul__(self, other):
         return Vec2(self.x * other, self.y * other)
+
+    def __mod__(self, other: Tuple[int, int]):
+        mod_x, mod_y = other
+        return Vec2(self.x % mod_x, self.y % mod_y)
 
     def rotate_degree(self, degree):
         """
